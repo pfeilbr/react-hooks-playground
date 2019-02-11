@@ -1,3 +1,9 @@
+# react-hooks-playground
+
+learn [React Hooks](https://reactjs.org/docs/hooks-intro.html) introduced in React 16.8
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
