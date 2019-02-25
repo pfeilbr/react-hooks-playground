@@ -1,105 +1,171 @@
-import React, { Component, useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component, useState, useEffect } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import styled from "styled-components";
 
-const sleep = (ms = 0) => (new Promise(r => setTimeout(r, ms)))
+const sleep = (ms = 0) => new Promise(r => setTimeout(r, ms));
 
 interface User {
-  id: number,
-  name: string,
-  age: number,
-  isLoading: boolean
+  id: number;
+  name: string;
+  age: number;
+  isLoading: boolean;
 }
 
 const users = [
   {
-    "id": 0,
-    "name": "Tricia",
-    "age": 44
-  },  
-  {
-    "id": 1,
-    "name": "Brian",
-    "age": 41
+    id: 0,
+    name: "Tricia",
+    age: 44
   },
   {
-    "id": 2,
-    "name": "Wyatt",
-    "age": 13
+    id: 1,
+    name: "Brian",
+    age: 41
   },
   {
-    "id": 3,
-    "name": "Max",
-    "age": 9
-  }  
-]
+    id: 2,
+    name: "Wyatt",
+    age: 13
+  },
+  {
+    id: 3,
+    name: "Max",
+    age: 9
+  }
+];
 
 const fetchUser = async (id: number) => {
   // simulate server delay
-  await sleep(1000)
-  return users.find((user) => (user.id === id))
-}
+  await sleep(1000);
+  return users.find(user => user.id === id);
+};
 
 interface MyComponentProps {
-  title: string
+  title: string;
 }
 
+const Title = styled.h1`
+  font-size: 1.5em;
+  text-align: center;
+  color: palevioletred;
+
+  ::before {
+    content: "🚀";
+  }
+
+  :hover {
+    color: lightblue;
+  }
+`;
+
+const Section = styled.section`
+  padding: 4em;
+  background: papayawhip;
+`;
+
+const Input = styled.input`
+  padding: 0.5em;
+  margin: 0.5em;
+  color: palevioletred;
+  background: papayawhip;
+  border: none;
+  border-radius: 3px;
+`;
+
 const MyComponent = (props: MyComponentProps) => {
-  const defaultUserId = 1
-  const initialState: User = {id: defaultUserId, isLoading: true, name: "", age: 0}
-  const [state, setState] = useState(initialState)
+  const defaultUserId = 1;
+  const initialState: User = {
+    id: defaultUserId,
+    isLoading: true,
+    name: "",
+    age: 0
+  };
+
+  const [state, setState] = useState(initialState);
 
   // creating inner async function since the function passed to `useEffect`
   // can not be `async`
   const loadUser = async (id: number) => {
-    setState(initialState)
-    const user = await fetchUser(id)
-    setState(Object.assign({}, user, {isLoading: false}))
-    return null  
-  }
+    setState(initialState);
+    const user = await fetchUser(id);
+    setState(Object.assign({}, user, { isLoading: false }));
+    return null;
+  };
 
   const handleUserIdChange = (e: any) => {
-    const userid: string = e.target.value
-    const id = parseInt(userid)
+    const userid: string = e.target.value;
+    const id = parseInt(userid);
     if (!isNaN(id)) {
-      loadUser(id)
+      loadUser(id);
     }
-  }
+  };
 
   useEffect(() => {
-    loadUser(defaultUserId)
-  }, [])
+    loadUser(defaultUserId);
+  }, []);
+
+  // define custom hook.  generates todos
+  const useTodos = () => {
+    let lastId = 0;
+    const [todos, setTodos] = useState([
+      { id: lastId, text: `todo #${lastId}` }
+    ]);
+
+    useEffect(() => {
+      setInterval(() => {
+        const id = new Date().getTime();
+        lastId = lastId + 1;
+        const text = `todo #${lastId}`;
+        todos.push({ id, text });
+        setTodos([...todos]); // NOTE: must use new array for hooks to detect
+        console.log(todos.length);
+      }, 1000);
+    }, []);
+
+    return todos;
+  };
+
+  // use custom hook
+  const todos = useTodos();
 
   return (
     <div>
-      <h1>{props.title}</h1>
-      {
-        state.isLoading ? (<div>loading ... </div>) :
-        (
-          <>
-            <div>id: {state.id}</div>
-            <div>name: {state.name}</div>
-            <div>age: {state.age}</div>
-          </>
-        )
-      }
+      <Title>{props.title}</Title>
+      {state.isLoading ? (
+        <div>loading ... </div>
+      ) : (
+        <Section>
+          <div>id: {state.id}</div>
+          <div>name: {state.name}</div>
+          <div>age: {state.age}</div>
+        </Section>
+      )}
       <div>
         <br />
         <span>userid:</span>
-        <input defaultValue={`${defaultUserId}`} onChange={handleUserIdChange}/>
+        <Input
+          defaultValue={`${defaultUserId}`}
+          onChange={handleUserIdChange}
+        />
         <div>
           <em>change userid to load a different user</em>
         </div>
       </div>
+      <hr />
+      <h3>Todos</h3>
+      <div>
+        {todos.map(todo => {
+          return <div key={todo.id}>{todo.text}</div>;
+        })}
+      </div>
     </div>
-  )
-}
+  );
+};
 
 class App extends Component {
   render() {
-    return (
-      <MyComponent title="User Details" />
-    );
+    return <MyComponent title="User Details" />;
   }
 }
 

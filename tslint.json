@@ -1,0 +1,8 @@
+{
+
+  "rules": {
+    "no-console": true,
+    "ordered-imports": false,
+    "no-any": true    
+  }
+}
