@@ -1,4 +1,10 @@
-import React, { Component, useState, useEffect } from "react";
+import React, {
+  Component,
+  createContext,
+  useState,
+  useEffect,
+  useContext
+} from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import styled from "styled-components";
@@ -34,6 +40,9 @@ const users = [
     age: 9
   }
 ];
+
+// context example
+const CurrentUser = createContext(users[0]);
 
 const fetchUser = async (id: number) => {
   // simulate server delay
@@ -130,36 +139,45 @@ const MyComponent = (props: MyComponentProps) => {
   const todos = useTodos();
 
   return (
-    <div>
-      <Title>{props.title}</Title>
-      {state.isLoading ? (
-        <div>loading ... </div>
-      ) : (
-        <Section>
-          <div>id: {state.id}</div>
-          <div>name: {state.name}</div>
-          <div>age: {state.age}</div>
-        </Section>
-      )}
+    <CurrentUser.Provider value={state}>
       <div>
-        <br />
-        <span>userid:</span>
-        <Input
-          defaultValue={`${defaultUserId}`}
-          onChange={handleUserIdChange}
-        />
+        <Title>{props.title}</Title>
+        {state.isLoading ? (
+          <div>loading ... </div>
+        ) : (
+          <Section>
+            <div>id: {state.id}</div>
+            <div>name: {state.name}</div>
+            <div>age: {state.age}</div>
+          </Section>
+        )}
         <div>
-          <em>change userid to load a different user</em>
+          <br />
+          <span>userid:</span>
+          <Input
+            defaultValue={`${defaultUserId}`}
+            onChange={handleUserIdChange}
+          />
+          <div>
+            <em>change userid to load a different user</em>
+          </div>
+        </div>
+        <hr />
+        <h3>Context Example</h3>
+        <div>
+          <CurrentUser.Consumer>
+            {user => <pre>{JSON.stringify(user, null, 2)}</pre>}
+          </CurrentUser.Consumer>
+        </div>
+        <hr />
+        <h3>Todos</h3>
+        <div>
+          {todos.map(todo => {
+            return <div key={todo.id}>{todo.text}</div>;
+          })}
         </div>
       </div>
-      <hr />
-      <h3>Todos</h3>
-      <div>
-        {todos.map(todo => {
-          return <div key={todo.id}>{todo.text}</div>;
-        })}
-      </div>
-    </div>
+    </CurrentUser.Provider>
   );
 };
 
