@@ -54,6 +54,12 @@ interface MyComponentProps {
   title: string;
 }
 
+interface UserDetailProps {
+  id: number;
+  name: string;
+  age: number;
+}
+
 const Title = styled.h1`
   font-size: 1.5em;
   text-align: center;
@@ -82,6 +88,26 @@ const Input = styled.input`
   border-radius: 3px;
 `;
 
+const UserDetails = (props: UserDetailProps) => (
+  <Section>
+    <div>id: {props.id}</div>
+    <div>name: {props.name}</div>
+    <div>age: {props.age}</div>
+  </Section>
+);
+
+const UserDetailsUsingUserContext = () => {
+  const user = useContext(CurrentUser);
+
+  return (
+    <Section>
+      <div>id: {user.id}</div>
+      <div>name: {user.name}</div>
+      <div>age: {user.age}</div>
+    </Section>
+  );
+};
+
 const MyComponent = (props: MyComponentProps) => {
   const defaultUserId = 1;
   const initialState: User = {
@@ -92,6 +118,7 @@ const MyComponent = (props: MyComponentProps) => {
   };
 
   const [state, setState] = useState(initialState);
+  const currentUserContext = useContext(CurrentUser);
 
   // creating inner async function since the function passed to `useEffect`
   // can not be `async`
@@ -142,15 +169,7 @@ const MyComponent = (props: MyComponentProps) => {
     <CurrentUser.Provider value={state}>
       <div>
         <Title>{props.title}</Title>
-        {state.isLoading ? (
-          <div>loading ... </div>
-        ) : (
-          <Section>
-            <div>id: {state.id}</div>
-            <div>name: {state.name}</div>
-            <div>age: {state.age}</div>
-          </Section>
-        )}
+        {state.isLoading ? <div>loading ... </div> : <UserDetails {...state} />}
         <div>
           <br />
           <span>userid:</span>
@@ -165,9 +184,7 @@ const MyComponent = (props: MyComponentProps) => {
         <hr />
         <h3>Context Example</h3>
         <div>
-          <CurrentUser.Consumer>
-            {user => <pre>{JSON.stringify(user, null, 2)}</pre>}
-          </CurrentUser.Consumer>
+          <UserDetailsUsingUserContext />
         </div>
         <hr />
         <h3>Todos</h3>
