@@ -98,14 +98,7 @@ const UserDetails = (props: UserDetailProps) => (
 
 const UserDetailsUsingUserContext = () => {
   const user = useContext(CurrentUser);
-
-  return (
-    <Section>
-      <div>id: {user.id}</div>
-      <div>name: {user.name}</div>
-      <div>age: {user.age}</div>
-    </Section>
-  );
+  return <UserDetails {...user} />;
 };
 
 const MyComponent = (props: MyComponentProps) => {
